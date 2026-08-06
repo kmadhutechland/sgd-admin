@@ -1,0 +1,301 @@
+{
+  "banners": [
+    {
+      "image": "/media/banner-fleet.jpg",
+      "alt": "A row of green SGD Electric scooters lined up",
+      "active": true,
+      "position": 0
+    },
+    {
+      "image": "/media/banner-charging.jpg",
+      "alt": "A green SGD Electric scooter charging at an EV point",
+      "active": true,
+      "position": 1
+    },
+    {
+      "image": "/media/banner-car.jpg",
+      "alt": "A green SGD Electric car",
+      "active": true,
+      "position": 2
+    }
+  ],
+  "team": [
+    {
+      "name": "Barupati Srikanth",
+      "role": "Founder & Chief Executive",
+      "bio": "",
+      "photo": "/media/founder.jpg",
+      "active": true,
+      "position": 0
+    }
+  ],
+  "gallery": [
+    {
+      "image": "https://images.pexels.com/photos/7580814/pexels-photo-7580814.jpeg?w=1600",
+      "caption": "Every excuse taken",
+      "tag": "Celebrations",
+      "alt": "Colleagues in party hats holding up a birthday sign in the office",
+      "active": true,
+      "position": 0
+    },
+    {
+      "image": "https://images.pexels.com/photos/7580789/pexels-photo-7580789.jpeg?w=1600",
+      "caption": "The group photo nobody escapes",
+      "tag": "Celebrations",
+      "alt": "Colleagues taking a selfie together wearing party hats",
+      "active": true,
+      "position": 1
+    },
+    {
+      "image": "https://images.pexels.com/photos/7581123/pexels-photo-7581123.jpeg?w=1600",
+      "caption": "New joiners",
+      "tag": "Milestones",
+      "alt": "Colleagues applauding a new joiner in the office",
+      "active": true,
+      "position": 2
+    },
+    {
+      "image": "https://images.pexels.com/photos/7793691/pexels-photo-7793691.jpeg?w=1600",
+      "caption": "City number twelve",
+      "tag": "Milestones",
+      "alt": "A team celebrating a result together in the office",
+      "active": true,
+      "position": 3
+    },
+    {
+      "image": "https://images.pexels.com/photos/21263347/pexels-photo-21263347.jpeg?w=1600",
+      "caption": "Holi, no exceptions",
+      "tag": "Festivals",
+      "alt": "A person smiling with bright coloured powder on their hands and face at Holi",
+      "active": true,
+      "position": 4
+    },
+    {
+      "image": "https://images.pexels.com/photos/4078516/pexels-photo-4078516.jpeg?w=1600",
+      "caption": "Diwali at every hub",
+      "tag": "Festivals",
+      "alt": "Oil lamps and marigold flowers lit for Diwali",
+      "active": true,
+      "position": 5
+    },
+    {
+      "image": "https://images.pexels.com/photos/8819253/pexels-photo-8819253.jpeg?w=1600",
+      "caption": "Sparklers on the forecourt",
+      "tag": "Festivals",
+      "alt": "A person in traditional dress holding a lit sparkler",
+      "active": true,
+      "position": 6
+    },
+    {
+      "image": "https://images.pexels.com/photos/30671896/pexels-photo-30671896.jpeg?w=1600",
+      "caption": "The inter-hub league",
+      "tag": "Games",
+      "alt": "A cricket match in progress on an open ground",
+      "active": true,
+      "position": 7
+    },
+    {
+      "image": "https://images.pexels.com/photos/33438350/pexels-photo-33438350.jpeg?w=1600",
+      "caption": "Settled over table tennis",
+      "tag": "Games",
+      "alt": "People playing table tennis in a recreation room",
+      "active": true,
+      "position": 8
+    },
+    {
+      "image": "https://images.pexels.com/photos/3184298/pexels-photo-3184298.jpeg?w=1600",
+      "caption": "Monday planning",
+      "tag": "Office",
+      "alt": "Colleagues working through a plan around a table",
+      "active": true,
+      "position": 9
+    },
+    {
+      "image": "https://images.pexels.com/photos/7869111/pexels-photo-7869111.jpeg?w=1600",
+      "caption": "Standups that overrun",
+      "tag": "Office",
+      "alt": "A team standing around a whiteboard during a discussion",
+      "active": true,
+      "position": 10
+    },
+    {
+      "image": "https://images.pexels.com/photos/28670971/pexels-photo-28670971.jpeg?w=1600",
+      "caption": "The line-up",
+      "tag": "Showroom",
+      "alt": "A row of green scooters parked side by side",
+      "active": true,
+      "position": 11
+    },
+    {
+      "image": "https://images.pexels.com/photos/15675779/pexels-photo-15675779.jpeg?w=1600",
+      "caption": "One rider, one scooter",
+      "tag": "Rides",
+      "alt": "A green electric moped parked on a street",
+      "active": true,
+      "position": 12
+    },
+    {
+      "image": "https://images.pexels.com/photos/13119037/pexels-photo-13119037.jpeg?w=1600",
+      "caption": "Loaded and out",
+      "tag": "Rides",
+      "alt": "A green scooter fitted with a delivery box and helmet",
+      "active": true,
+      "position": 13
+    },
+    {
+      "active": true,
+      "image": "/uploads/1785984466223-wall.jpeg",
+      "caption": "focus",
+      "tag": "Celebrations",
+      "alt": "",
+      "position": 14
+    }
+  ],
+  "reviews": [
+    {
+      "name": "Arun P.",
+      "city": "Chennai",
+      "stars": 5,
+      "text": "Switched three months back. My fuel bill was ₹9,000 a month. Now it is nothing.",
+      "active": true,
+      "position": 0
+    },
+    {
+      "name": "Farhan S.",
+      "city": "Hyderabad",
+      "stars": 5,
+      "text": "Battery swap takes under two minutes. I have never had to wait at a hub.",
+      "active": true,
+      "position": 1
+    },
+    {
+      "name": "Deepak R.",
+      "city": "Noida",
+      "stars": 5,
+      "text": "My scooter failed on a Tuesday. They handed me another one the same morning.",
+      "active": true,
+      "position": 2
+    },
+    {
+      "name": "Kavita M.",
+      "city": "Pune",
+      "stars": 5,
+      "text": "No licence needed on the low-speed model. That is the only reason I could start.",
+      "active": true,
+      "position": 3
+    },
+    {
+      "name": "Sameer T.",
+      "city": "Mumbai",
+      "stars": 5,
+      "text": "Earnings land in my account every night. No arguments, no follow-up calls.",
+      "active": true,
+      "position": 4
+    },
+    {
+      "name": "Rohit K.",
+      "city": "Jaipur",
+      "stars": 4,
+      "text": "Insurance was already included. I did not expect that at this rental price.",
+      "active": true,
+      "position": 5
+    },
+    {
+      "name": "Nasir A.",
+      "city": "Ahmedabad",
+      "stars": 5,
+      "text": "I run eight vehicles now. The dashboard tells me which one is idle before I ask.",
+      "active": true,
+      "position": 6
+    },
+    {
+      "name": "Lakshmi V.",
+      "city": "Bengaluru",
+      "stars": 5,
+      "text": "Servicing costs me nothing. That alone is ₹1,500 back in my pocket each month.",
+      "active": true,
+      "position": 7
+    },
+    {
+      "name": "Gurpreet S.",
+      "city": "Delhi NCR",
+      "stars": 5,
+      "text": "Two years on the platform and not one day lost to a breakdown.",
+      "active": true,
+      "position": 8
+    },
+    {
+      "name": "Manoj B.",
+      "city": "Lucknow",
+      "stars": 5,
+      "text": "Rent to own means it becomes mine. My father did not believe me until he saw the papers.",
+      "active": true,
+      "position": 9
+    },
+    {
+      "name": "Srinivas D.",
+      "city": "Hyderabad",
+      "stars": 5,
+      "text": "Support answered me in Telugu. Small thing, but it made the whole difference.",
+      "active": true,
+      "position": 10
+    },
+    {
+      "name": "Imtiaz H.",
+      "city": "Kolkata",
+      "stars": 5,
+      "text": "A full day of riding costs me about ₹20 to charge. Petrol was ₹300.",
+      "active": true,
+      "position": 11
+    }
+  ],
+  "contact": {
+    "phone": "+91 85000 85120",
+    "phoneHref": "tel:+918500085120",
+    "email": "communication@sgdlogistics.in",
+    "address": "Manjeera Trinity Corporate, KPHB Phase 3, Kukatpally Housing Board Colony, Kukatpally, Hyderabad, Telangana 500072",
+    "city": "Hyderabad",
+    "hours": [
+      {
+        "days": "Office",
+        "time": "10:00 AM – 7:00 PM"
+      },
+      {
+        "days": "Customer support",
+        "time": "5:00 AM – 11:00 PM"
+      },
+      {
+        "days": "Weekly off",
+        "time": "One day a week"
+      }
+    ],
+    "socials": [
+      {
+        "label": "LinkedIn",
+        "href": "https://www.linkedin.com/",
+        "icon": "Linkedin"
+      },
+      {
+        "label": "Instagram",
+        "href": "https://www.instagram.com/",
+        "icon": "Instagram"
+      },
+      {
+        "label": "YouTube",
+        "href": "https://www.youtube.com/",
+        "icon": "Youtube"
+      },
+      {
+        "label": "X",
+        "href": "https://x.com/",
+        "icon": "Twitter"
+      },
+      {
+        "label": "Facebook",
+        "href": "https://www.facebook.com/",
+        "icon": "Facebook"
+      }
+    ],
+    "updatedAt": "2026-08-06T03:43:04.387Z"
+  }
+}

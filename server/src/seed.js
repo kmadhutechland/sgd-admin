@@ -1,19 +1,24 @@
 /**
- * Seeds the database from the content already on the site.
+ * Seeds an empty database from the snapshot in server/seed/.
  *
- * The admin panel is worth nothing opening onto empty tables, and re-typing what
- * is already in src/data is both slow and a chance to introduce differences. So
- * this reads the real site files and imports them.
+ * Safe to re-run: it does nothing if an admin account already exists, so it
+ * cannot quietly wipe edits made through the panel.
  *
- * Safe to re-run: it does nothing if an admin user already exists, so it cannot
- * quietly wipe edits made through the panel.
+ * This used to read the website's source files from a path hardcoded to one
+ * laptop, which meant a deployed server could only ever open onto empty tables.
+ * It now reads a snapshot committed to this repository — run
+ * `node src/export-seed.js` to refresh it.
  */
 import fs from 'node:fs'
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { collection, singleton, isEmpty } from './store.js'
 import { createUser } from './auth.js'
 
-const SITE = 'c:/techland/zapp/src/data'
+const HERE = path.dirname(fileURLToPath(import.meta.url))
+const SEED_DIR = path.join(HERE, '..', 'seed')
+const ASSET_DIR = path.join(SEED_DIR, 'assets')
+const UPLOADS = path.join(HERE, '..', 'uploads')
 
 /*
  * The first account. Only used on a database that has never been seeded —
@@ -25,100 +30,20 @@ const SITE = 'c:/techland/zapp/src/data'
 const DEFAULT_USERNAME = process.env.ADMIN_USERNAME ?? 'admin123'
 const DEFAULT_PASSWORD = process.env.ADMIN_PASSWORD ?? 'password123'
 
-const avatar = (id) => `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?w=400`
-const photo = (id, w = 1600) =>
-  `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?w=${w}`
-
-/*
- * The real IMG map, filled in before anything else is read.
- *
- * Stubbing IMG with a proxy that returned the key name seeded every gallery row
- * with the literal string "IMG.cultureCheer" instead of a URL, and the site
- * rendered broken images. IMG lives in the same file as the content that
- * references it, so it is resolved first and handed to every later read.
- */
-export const IMG_MAP = {}
-
-/**
- * Pull one `export const NAME = [...]` or `{...}` out of a source file.
- *
- * The data files are plain ES modules of literals, so evaluating the extracted
- * literal is enough — no bundler, no import of the site's whole dependency tree.
- */
-export function readExport(file, name) {
-  const src = fs.readFileSync(path.join(SITE, file), 'utf8')
-  const start = src.indexOf(`export const ${name} =`)
-  if (start === -1) return null
-
-  const open = src.indexOf('=', start) + 1
-  let i = open
-  while (i < src.length && ' \n\r\t'.includes(src[i])) i++
-  const opener = src[i]
-  const closer = opener === '[' ? ']' : '}'
-  if (!'[{'.includes(opener)) return null
-
-  let depth = 0
-  let end = i
-  let inStr = null
-  for (; i < src.length; i++) {
-    const c = src[i]
-
-    if (inStr) {
-      if (c === '\\') i++
-      else if (c === inStr) inStr = null
-      continue
-    }
-
-    // Comments have to be skipped, not scanned. CONTACT carries a block comment
-    // containing "the client's address"; that apostrophe was opening a string
-    // that never closed, so the scan ran past the end of the object.
-    if (c === '/' && src[i + 1] === '/') {
-      i = src.indexOf('\n', i)
-      if (i === -1) break
-      continue
-    }
-    if (c === '/' && src[i + 1] === '*') {
-      i = src.indexOf('*/', i + 2)
-      if (i === -1) break
-      i += 1
-      continue
-    }
-
-    if (c === "'" || c === '"' || c === '`') inStr = c
-    else if (c === opener) depth++
-    else if (c === closer) {
-      depth--
-      if (depth === 0) {
-        end = i + 1
-        break
-      }
-    }
-  }
-
-  const literal = src.slice(src.indexOf(opener, open), end)
-  try {
-    // eslint-disable-next-line no-new-func
-    return new Function('IMG', 'avatar', 'photo', `return (${literal})`)(IMG_MAP, avatar, photo)
-  } catch (e) {
-    console.warn(`  could not evaluate ${name}: ${e.message}`)
-    return null
-  }
-}
-
-/** Resolve IMG before any content that references it is read. */
-export function loadImageMap() {
-  Object.assign(IMG_MAP, readExport('media.js', 'IMG') ?? {})
-  console.log(`Resolved ${Object.keys(IMG_MAP).length} image keys`)
-}
-
 async function run() {
-  loadImageMap()
-
   if (!isEmpty()) {
     console.log('Database already seeded — nothing to do.')
     console.log('Delete server/data/db.json first if you want to start over.')
     return
   }
+
+  const file = path.join(SEED_DIR, 'content.json')
+  if (!fs.existsSync(file)) {
+    console.error('No snapshot at server/seed/content.json.')
+    console.error('Run `node src/export-seed.js` on a machine that has the content.')
+    process.exit(1)
+  }
+  const content = JSON.parse(fs.readFileSync(file, 'utf8'))
 
   const user = await createUser({
     email: DEFAULT_USERNAME,
@@ -127,84 +52,46 @@ async function run() {
   })
   console.log(`Created admin user: ${user.email}`)
 
-  // ---- banners -----------------------------------------------------
-  const slides = readExport('media.js', 'BANNER_SLIDES') ?? []
-  const banners = collection('banners')
-  slides.forEach((s, i) =>
-    banners.create({ image: s.src, alt: s.alt ?? '', active: true, position: i }),
-  )
-  console.log(`Imported ${slides.length} banners`)
+  for (const name of ['banners', 'team', 'gallery', 'reviews']) {
+    const rows = content[name] ?? []
+    const store = collection(name)
+    rows.forEach((row, i) => store.create({ ...row, position: row.position ?? i }))
+    console.log(`Imported ${rows.length} ${name}`)
+  }
 
-  // ---- team --------------------------------------------------------
-  const leadership = readExport('content.js', 'LEADERSHIP') ?? []
-  const team = collection('team')
-  leadership.forEach((m, i) =>
-    team.create({
-      name: m.name,
-      role: m.role,
-      bio: m.bio ?? '',
-      photo: typeof m.photo === 'string' ? m.photo : '',
-      active: true,
-      position: i,
-    }),
-  )
-  console.log(`Imported ${leadership.length} team members`)
-
-  // ---- gallery -----------------------------------------------------
-  const shots = readExport('content.js', 'GALLERY') ?? []
-  const gallery = collection('gallery')
-  shots.forEach((g, i) =>
-    gallery.create({
-      image: typeof g.src === 'string' ? g.src : '',
-      caption: g.caption ?? '',
-      tag: g.tag ?? 'Celebrations',
-      alt: g.alt ?? '',
-      active: true,
-      position: i,
-    }),
-  )
-  console.log(`Imported ${shots.length} gallery images`)
-
-  // ---- reviews -----------------------------------------------------
-  const list = readExport('content.js', 'REVIEWS') ?? []
-  const reviews = collection('reviews')
-  list.forEach((r, i) =>
-    reviews.create({
-      name: r.name,
-      city: r.city ?? '',
-      stars: r.stars ?? 5,
-      text: r.text ?? '',
-      active: true,
-      position: i,
-    }),
-  )
-  console.log(`Imported ${list.length} reviews`)
-
-  // ---- contact -----------------------------------------------------
-  const c = readExport('site.js', 'CONTACT')
-  const socials = readExport('site.js', 'SOCIALS') ?? []
-  if (c) {
-    singleton('contact').set({
-      phone: c.phone ?? '',
-      phoneHref: c.phoneHref ?? '',
-      email: c.supportEmail ?? '',
-      address: [c.hq?.line1, c.hq?.line2, c.hq?.city].filter(Boolean).join(', '),
-      city: 'Hyderabad',
-      hours: c.hours ?? [],
-      socials,
-    })
+  if (content.contact) {
+    singleton('contact').set(content.contact)
     console.log('Imported contact details')
+  }
+
+  /*
+   * Restore uploaded files.
+   *
+   * uploads/ is gitignored, so without this every row pointing at /uploads/…
+   * would arrive on a fresh server with no file behind it — the images would be
+   * in the panel and broken on the site.
+   */
+  if (fs.existsSync(ASSET_DIR)) {
+    fs.mkdirSync(UPLOADS, { recursive: true })
+    let restored = 0
+    for (const name of fs.readdirSync(ASSET_DIR)) {
+      const to = path.join(UPLOADS, name)
+      // never overwrite a real upload that happens to share a name
+      if (!fs.existsSync(to)) {
+        fs.copyFileSync(path.join(ASSET_DIR, name), to)
+        restored++
+      }
+    }
+    if (restored) console.log(`Restored ${restored} uploaded files`)
   }
 
   console.log('\nSeed complete. Sign in with:')
   console.log(`  username ${DEFAULT_USERNAME}`)
   console.log(`  password ${DEFAULT_PASSWORD}`)
-  console.log('\nChange the password before this is reachable from the internet.')
+  console.log('\nChange both with `node src/set-admin.js` before this is public.')
 }
 
-if (process.argv[1]?.endsWith('seed.js')) {
-  run().catch((e) => {
-    console.error(e)
-    process.exit(1)
-  })
-}
+run().catch((e) => {
+  console.error(e)
+  process.exit(1)
+})
