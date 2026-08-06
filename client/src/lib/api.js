@@ -1,12 +1,33 @@
-const BASE = import.meta.env.VITE_API ?? 'http://localhost:4000'
+// named to match the website's own variable — two names for the same API is a
+// deployment mistake waiting to happen
+const BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:4000'
+/*
+ * Where the public website lives.
+ *
+ * Some rows point at files the website ships itself — /media/founder.jpg and
+ * the seeded banners. Those are not the API's to serve, so resolving them
+ * against BASE asked localhost:4000 for a file it has never had, and every
+ * seeded banner and team thumbnail was a broken image in the panel.
+ */
+const SITE = import.meta.env.VITE_SITE_URL ?? 'http://localhost:5173'
 const TOKEN_KEY = 'sgd-admin-token'
 
 export const getToken = () => localStorage.getItem(TOKEN_KEY)
 export const setToken = (t) => localStorage.setItem(TOKEN_KEY, t)
 export const clearToken = () => localStorage.removeItem(TOKEN_KEY)
 
-/** Absolute URL for an uploaded file — stored paths are server-relative. */
-export const mediaUrl = (p) => (!p ? '' : /^https?:|^data:/.test(p) ? p : `${BASE}${p}`)
+/**
+ * Absolute URL for a stored image path.
+ *
+ * Three cases: already absolute, shipped by the website (/media/…), or uploaded
+ * through the panel and served by the API (/uploads/…).
+ */
+export const mediaUrl = (p) => {
+  if (!p) return ''
+  if (/^https?:|^data:/.test(p)) return p
+  if (p.startsWith('/media/')) return `${SITE}${p}`
+  return `${BASE}${p}`
+}
 
 /**
  * Thrown for any non-2xx response.
