@@ -46,14 +46,17 @@ export default function Login({ onSignedIn }) {
           )}
 
           <label className="block">
-            <span className="mb-1.5 block text-[13px] font-semibold text-white/70">Email</span>
+            <span className="mb-1.5 block text-[13px] font-semibold text-white/70">Username</span>
+            {/* text, not email: the account is identified by whatever string it
+                was created with, and type="email" made the browser refuse to
+                submit a plain username before the server ever saw it */}
             <Input
-              type="email"
+              type="text"
               required
               autoComplete="username"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@sgdlogistics.in"
+              placeholder="admin123"
               className="border-white/15 bg-white/5 text-white placeholder:text-white/30"
             />
           </label>

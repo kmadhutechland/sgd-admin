@@ -23,12 +23,23 @@ npm run dev      # panel on http://localhost:5175
 Sign in with the account the seed prints:
 
 ```
-email     admin@sgdlogistics.in
-password  sgd-admin-2026
+username  admin123
+password  password123
 ```
 
-**Change that password, and set `JWT_SECRET`, before this is reachable from the
-internet.** Both are called out at boot.
+The username is not an email address — the account is identified by whatever
+string it was created with.
+
+To change either later:
+
+```bash
+node src/set-admin.js <username> <password>
+```
+
+**Change both, and set `JWT_SECRET`, before this is reachable from the
+internet.** These defaults are in this repository, so on a public host anyone
+who has read the source can sign in and edit the website. Both are called out
+at boot.
 
 ## How it fits together
 

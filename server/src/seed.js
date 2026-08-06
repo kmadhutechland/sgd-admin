@@ -15,8 +15,15 @@ import { createUser } from './auth.js'
 
 const SITE = 'c:/techland/zapp/src/data'
 
-const DEFAULT_EMAIL = process.env.ADMIN_EMAIL ?? 'admin@sgdlogistics.in'
-const DEFAULT_PASSWORD = process.env.ADMIN_PASSWORD ?? 'sgd-admin-2026'
+/*
+ * The first account. Only used on a database that has never been seeded —
+ * changing these afterwards does nothing, use `node src/set-admin.js` for that.
+ *
+ * ADMIN_USERNAME rather than ADMIN_EMAIL: the account is identified by whatever
+ * string it was created with, and this one is not an address.
+ */
+const DEFAULT_USERNAME = process.env.ADMIN_USERNAME ?? 'admin123'
+const DEFAULT_PASSWORD = process.env.ADMIN_PASSWORD ?? 'password123'
 
 const avatar = (id) => `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?w=400`
 const photo = (id, w = 1600) =>
@@ -114,7 +121,7 @@ async function run() {
   }
 
   const user = await createUser({
-    email: DEFAULT_EMAIL,
+    email: DEFAULT_USERNAME,
     password: DEFAULT_PASSWORD,
     name: 'SGD Administrator',
   })
@@ -190,7 +197,7 @@ async function run() {
   }
 
   console.log('\nSeed complete. Sign in with:')
-  console.log(`  email    ${DEFAULT_EMAIL}`)
+  console.log(`  username ${DEFAULT_USERNAME}`)
   console.log(`  password ${DEFAULT_PASSWORD}`)
   console.log('\nChange the password before this is reachable from the internet.')
 }
