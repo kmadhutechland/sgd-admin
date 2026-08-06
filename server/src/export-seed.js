@@ -26,7 +26,7 @@ import { collection, singleton } from './store.js'
 const HERE = path.dirname(fileURLToPath(import.meta.url))
 const SEED_DIR = path.join(HERE, '..', 'seed')
 const ASSET_DIR = path.join(SEED_DIR, 'assets')
-const UPLOADS = path.join(HERE, '..', 'uploads')
+const UPLOADS = process.env.UPLOADS_DIR ?? path.join(HERE, '..', 'uploads')
 
 fs.mkdirSync(ASSET_DIR, { recursive: true })
 

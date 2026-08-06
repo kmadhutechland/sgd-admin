@@ -5,7 +5,14 @@ import { fileURLToPath } from 'node:url'
 import { EventEmitter } from 'node:events'
 
 const HERE = path.dirname(fileURLToPath(import.meta.url))
-const DATA_DIR = path.join(HERE, '..', 'data')
+/*
+ * Where the database lives.
+ *
+ * Overridable because a host's own filesystem is usually wiped on every deploy;
+ * on Render this points into a mounted disk, which is the only thing that
+ * survives a restart. Defaults to server/data for local work.
+ */
+const DATA_DIR = process.env.DATA_DIR ?? path.join(HERE, '..', 'data')
 const DB_FILE = path.join(DATA_DIR, 'db.json')
 
 /**

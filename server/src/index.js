@@ -10,7 +10,9 @@ import { collection, singleton, changes, changedAt } from './store.js'
 import { requireAuth, verify, issueToken, IS_DEFAULT_SECRET } from './auth.js'
 
 const HERE = path.dirname(fileURLToPath(import.meta.url))
-const UPLOADS = path.join(HERE, '..', 'uploads')
+// overridable for the same reason as DATA_DIR: on a host these have to sit on a
+// mounted disk, or every uploaded image is lost on the next restart
+const UPLOADS = process.env.UPLOADS_DIR ?? path.join(HERE, '..', 'uploads')
 fs.mkdirSync(UPLOADS, { recursive: true })
 
 const PORT = Number(process.env.PORT ?? 4000)

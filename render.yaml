@@ -1,0 +1,39 @@
+# Render blueprint for the admin API.
+#
+# Import this repository at https://render.com → New → Blueprint and Render
+# reads this file instead of asking for build settings.
+#
+# The disk is the important part. Without it the container's filesystem is
+# wiped on every deploy and every restart, so db.json and every uploaded image
+# would disappear — the exact "my images vanished" failure, permanently.
+#
+# Disks require a paid instance. On the free tier this service still runs, but
+# treat its content as disposable: it will be lost when the service sleeps or
+# redeploys.
+services:
+  - type: web
+    name: sgd-admin-api
+    runtime: node
+    plan: starter
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      # signs admin login tokens — generated once, never in the repository
+      - key: JWT_SECRET
+        generateValue: true
+      # the first admin account; set these in the dashboard, not here
+      - key: ADMIN_USERNAME
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      # both point into the mounted disk, so they survive a restart
+      - key: DATA_DIR
+        value: /var/data/data
+      - key: UPLOADS_DIR
+        value: /var/data/uploads
+    disk:
+      name: sgd-content
+      mountPath: /var/data
+      sizeGB: 1

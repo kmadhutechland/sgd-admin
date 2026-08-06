@@ -18,7 +18,8 @@ import { createUser } from './auth.js'
 const HERE = path.dirname(fileURLToPath(import.meta.url))
 const SEED_DIR = path.join(HERE, '..', 'seed')
 const ASSET_DIR = path.join(SEED_DIR, 'assets')
-const UPLOADS = path.join(HERE, '..', 'uploads')
+// must match the server's, or the seed restores files where nothing serves them
+const UPLOADS = process.env.UPLOADS_DIR ?? path.join(HERE, '..', 'uploads')
 
 /*
  * The first account. Only used on a database that has never been seeded —
