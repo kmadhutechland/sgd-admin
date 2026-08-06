@@ -18,13 +18,27 @@ const SITE = 'c:/techland/zapp/src/data'
 const DEFAULT_EMAIL = process.env.ADMIN_EMAIL ?? 'admin@sgdlogistics.in'
 const DEFAULT_PASSWORD = process.env.ADMIN_PASSWORD ?? 'sgd-admin-2026'
 
+const avatar = (id) => `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?w=400`
+const photo = (id, w = 1600) =>
+  `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?w=${w}`
+
+/*
+ * The real IMG map, filled in before anything else is read.
+ *
+ * Stubbing IMG with a proxy that returned the key name seeded every gallery row
+ * with the literal string "IMG.cultureCheer" instead of a URL, and the site
+ * rendered broken images. IMG lives in the same file as the content that
+ * references it, so it is resolved first and handed to every later read.
+ */
+export const IMG_MAP = {}
+
 /**
  * Pull one `export const NAME = [...]` or `{...}` out of a source file.
  *
  * The data files are plain ES modules of literals, so evaluating the extracted
  * literal is enough — no bundler, no import of the site's whole dependency tree.
  */
-function readExport(file, name) {
+export function readExport(file, name) {
   const src = fs.readFileSync(path.join(SITE, file), 'utf8')
   const start = src.indexOf(`export const ${name} =`)
   if (start === -1) return null
@@ -76,20 +90,23 @@ function readExport(file, name) {
 
   const literal = src.slice(src.indexOf(opener, open), end)
   try {
-    // the literals reference IMG.* and helpers; stub them so they evaluate
-    const IMG = new Proxy({}, { get: (_t, k) => `IMG.${String(k)}` })
-    const avatar = (id) => `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?w=400`
-    const photo = (id, w = 1600) =>
-      `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?w=${w}`
     // eslint-disable-next-line no-new-func
-    return new Function('IMG', 'avatar', 'photo', `return (${literal})`)(IMG, avatar, photo)
+    return new Function('IMG', 'avatar', 'photo', `return (${literal})`)(IMG_MAP, avatar, photo)
   } catch (e) {
     console.warn(`  could not evaluate ${name}: ${e.message}`)
     return null
   }
 }
 
+/** Resolve IMG before any content that references it is read. */
+export function loadImageMap() {
+  Object.assign(IMG_MAP, readExport('media.js', 'IMG') ?? {})
+  console.log(`Resolved ${Object.keys(IMG_MAP).length} image keys`)
+}
+
 async function run() {
+  loadImageMap()
+
   if (!isEmpty()) {
     console.log('Database already seeded — nothing to do.')
     console.log('Delete server/data/db.json first if you want to start over.')
@@ -178,7 +195,9 @@ async function run() {
   console.log('\nChange the password before this is reachable from the internet.')
 }
 
-run().catch((e) => {
-  console.error(e)
-  process.exit(1)
-})
+if (process.argv[1]?.endsWith('seed.js')) {
+  run().catch((e) => {
+    console.error(e)
+    process.exit(1)
+  })
+}

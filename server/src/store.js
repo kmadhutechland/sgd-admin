@@ -2,6 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import crypto from 'node:crypto'
 import { fileURLToPath } from 'node:url'
+import { EventEmitter } from 'node:events'
 
 const HERE = path.dirname(fileURLToPath(import.meta.url))
 const DATA_DIR = path.join(HERE, '..', 'data')
@@ -30,16 +31,51 @@ const EMPTY = {
   settings: {},
 }
 
-let cache = null
+/**
+ * Announces every write, so the live-updates endpoint can tell connected
+ * websites to refetch.
+ *
+ * Emitted from persist() rather than from each route, so nothing can change the
+ * data without the website hearing about it — including the seed script.
+ */
+export const changes = new EventEmitter()
+// several visitors plus the admin panel can be listening at once
+changes.setMaxListeners(100)
 
+let lastChange = Date.now()
+export const changedAt = () => lastChange
+
+let cache = null
+/** mtime of the file the cache was built from, so we can tell if it moved on. */
+let cacheMtime = 0
+
+/**
+ * Read the database, reloading if the file changed underneath us.
+ *
+ * Caching it forever was wrong: the seed and repair scripts are separate
+ * processes writing the same file, and a running server would hold its stale
+ * copy and re-persist it on the next edit — quietly undoing their work. The
+ * mtime check costs one stat per read and makes those scripts safe to run
+ * beside a live server.
+ */
 function load() {
-  if (cache) return cache
   fs.mkdirSync(DATA_DIR, { recursive: true })
+
+  let mtime = 0
+  try {
+    mtime = fs.statSync(DB_FILE).mtimeMs
+  } catch {
+    // no file yet
+  }
+  if (cache && mtime === cacheMtime) return cache
+
   try {
     cache = { ...EMPTY, ...JSON.parse(fs.readFileSync(DB_FILE, 'utf8')) }
+    cacheMtime = mtime
   } catch {
     // missing or unreadable — start from empty rather than crashing on boot
     cache = structuredClone(EMPTY)
+    cacheMtime = mtime
   }
   return cache
 }
@@ -56,6 +92,14 @@ function persist() {
   const tmp = `${DB_FILE}.${process.pid}.tmp`
   fs.writeFileSync(tmp, JSON.stringify(cache, null, 2), 'utf8')
   fs.renameSync(tmp, DB_FILE)
+  // record our own write, so load() does not treat it as someone else's
+  try {
+    cacheMtime = fs.statSync(DB_FILE).mtimeMs
+  } catch {
+    cacheMtime = 0
+  }
+  lastChange = Date.now()
+  changes.emit('change', lastChange)
 }
 
 const now = () => new Date().toISOString()

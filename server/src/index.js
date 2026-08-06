@@ -6,7 +6,7 @@ import cors from 'cors'
 import multer from 'multer'
 import { z } from 'zod'
 
-import { collection, singleton } from './store.js'
+import { collection, singleton, changes, changedAt } from './store.js'
 import { requireAuth, verify, issueToken, IS_DEFAULT_SECRET } from './auth.js'
 
 const HERE = path.dirname(fileURLToPath(import.meta.url))
@@ -227,6 +227,43 @@ app.post('/api/upload', requireAuth, (req, res) => {
       size: req.file.size,
       type: req.file.mimetype,
     })
+  })
+})
+
+/**
+ * Live updates, over Server-Sent Events.
+ *
+ * One-way server-to-browser is exactly the shape of this problem, and SSE is
+ * plain HTTP: no extra dependency, no upgrade handshake, and the browser
+ * reconnects on its own if the connection drops or the API restarts.
+ *
+ * The payload is only a timestamp — the client refetches what it needs. Sending
+ * the changed rows would mean every client parsing updates for content it does
+ * not render.
+ */
+app.get('/api/stream', (req, res) => {
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache, no-transform',
+    Connection: 'keep-alive',
+    // proxies that buffer would hold events until the connection closed
+    'X-Accel-Buffering': 'no',
+  })
+
+  const send = (at) => res.write(`event: change\ndata: ${JSON.stringify({ at })}\n\n`)
+
+  // tell a joiner where things stand, so it can tell whether it missed anything
+  res.write(`event: hello\ndata: ${JSON.stringify({ at: changedAt() })}\n\n`)
+
+  changes.on('change', send)
+
+  // a comment line every 25s: idle connections get dropped by proxies and by
+  // some hosts, and this is cheap enough to be invisible
+  const keepAlive = setInterval(() => res.write(': keep-alive\n\n'), 25_000)
+
+  req.on('close', () => {
+    clearInterval(keepAlive)
+    changes.off('change', send)
   })
 })
 
