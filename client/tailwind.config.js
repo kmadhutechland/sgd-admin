@@ -10,6 +10,14 @@ export default {
         ink: { 400:'#889990',500:'#5A6B62',600:'#33443B',700:'#0F231A',800:'#0A1A13',900:'#06120C',950:'#030907' },
       },
       fontFamily: { sans: ['Inter','system-ui','sans-serif'], display: ['Sora','system-ui','sans-serif'] },
+      /*
+       * Tailwind's default ring is blue-500, which is nowhere in this palette.
+       * A `ring-*` class that fails to generate — an opacity step off the
+       * default scale, say — silently falls back to it, and a stray blue ring
+       * on a green panel is easy to miss in review. Defaulting to brand means
+       * that mistake is invisible rather than wrong.
+       */
+      ringColor: { DEFAULT: '#12B76A' },
       boxShadow: {
         // a green-tinted lift rather than a grey one, so cards sit on the
         // warm background instead of looking cut out of it

@@ -17,7 +17,7 @@ export function Button({ variant = 'primary', busy, children, className, ...rest
     ghost: 'text-ink-600 hover:bg-ink-900/5',
     danger: 'text-red-600 hover:bg-red-50',
     outline:
-      'border border-ink-900/12 bg-white text-ink-700 shadow-sm hover:border-brand-500/40 hover:text-brand-700',
+      'border border-ink-900/[.12] bg-white text-ink-700 shadow-sm hover:border-brand-500/40 hover:text-brand-700',
   }
   return (
     <button
@@ -33,6 +33,60 @@ export function Button({ variant = 'primary', busy, children, className, ...rest
       )}
     >
       {busy && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+      {children}
+    </button>
+  )
+}
+
+/**
+ * A square icon action — edit, hide, delete, reorder.
+ *
+ * These used to be bare icons on a white row: three grey glyphs that read as
+ * decoration until hovered, with nothing to say which one was destructive. Each
+ * now sits on its own tinted chip, so the row shows what it can do at rest, and
+ * delete is visibly the odd one out before it is clicked rather than after.
+ *
+ * `tone` picks the colour; `active` is for a toggle that is currently on.
+ */
+export function IconButton({ tone = 'neutral', active = false, className, children, ...rest }) {
+  const tones = {
+    neutral:
+      'bg-ink-900/[.04] text-ink-500 ring-ink-900/[.06] hover:bg-ink-900/[.07] hover:text-ink-800 hover:ring-ink-900/10',
+    brand:
+      'bg-brand-50 text-brand-600 ring-brand-600/[.12] hover:bg-brand-100 hover:text-brand-700 hover:ring-brand-600/25',
+    danger:
+      'bg-red-50/70 text-red-500/80 ring-red-500/10 hover:bg-red-100 hover:text-red-600 hover:ring-red-500/30',
+  }
+  return (
+    <button
+      {...rest}
+      className={cn(
+        'grid h-9 w-9 place-items-center rounded-xl ring-1 ring-inset',
+        'transition-all duration-200 hover:-translate-y-px hover:shadow-sm active:translate-y-0 active:scale-95',
+        'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500',
+        'disabled:pointer-events-none disabled:opacity-30',
+        tones[active ? 'brand' : tone],
+        className,
+      )}
+    >
+      {children}
+    </button>
+  )
+}
+
+/** The up/down pair — narrower, since they sit as a stacked column. */
+export function StepButton({ className, children, ...rest }) {
+  return (
+    <button
+      {...rest}
+      className={cn(
+        'grid h-[18px] w-7 place-items-center rounded-md text-ink-500 transition-all duration-150',
+        'hover:bg-brand-50 hover:text-brand-700 active:scale-90',
+        'focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-500',
+        'disabled:pointer-events-none disabled:opacity-20',
+        className,
+      )}
+    >
       {children}
     </button>
   )
@@ -64,12 +118,12 @@ export function Field({ label, error, hint, children, required }) {
 }
 
 const inputBase =
-  'w-full rounded-xl border bg-white px-3.5 py-2.5 text-[14px] text-ink-900 outline-none transition-all duration-200 placeholder:text-ink-500/50 hover:border-ink-900/25 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/12'
+  'w-full rounded-xl border bg-white px-3.5 py-2.5 text-[14px] text-ink-900 outline-none transition-all duration-200 placeholder:text-ink-500/50 hover:border-ink-900/25 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/[.12]'
 
 export const Input = ({ error, className, ...rest }) => (
   <input
     {...rest}
-    className={cn(inputBase, error ? 'border-red-400' : 'border-ink-900/12', className)}
+    className={cn(inputBase, error ? 'border-red-400' : 'border-ink-900/[.12]', className)}
   />
 )
 
@@ -77,14 +131,14 @@ export const Textarea = ({ error, rows = 4, className, ...rest }) => (
   <textarea
     {...rest}
     rows={rows}
-    className={cn(inputBase, 'resize-y', error ? 'border-red-400' : 'border-ink-900/12', className)}
+    className={cn(inputBase, 'resize-y', error ? 'border-red-400' : 'border-ink-900/[.12]', className)}
   />
 )
 
 export const Select = ({ error, options = [], className, ...rest }) => (
   <select
     {...rest}
-    className={cn(inputBase, error ? 'border-red-400' : 'border-ink-900/12', className)}
+    className={cn(inputBase, error ? 'border-red-400' : 'border-ink-900/[.12]', className)}
   >
     {options.map((o) => (
       <option key={o} value={o}>

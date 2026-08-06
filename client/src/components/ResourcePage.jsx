@@ -6,12 +6,14 @@ import {
   ConfirmDelete,
   Empty,
   Field,
+  IconButton,
   ImageInput,
   Input,
   Modal,
   PageHeader,
   Select,
   Stars,
+  StepButton,
   Textarea,
   Toast,
   cn,
@@ -168,59 +170,62 @@ export default function ResourcePage({
               >
                 {/* order controls — buttons rather than drag, so this works on a
                     touch screen and from the keyboard without extra machinery */}
-                <div className="flex shrink-0 flex-col">
-                  <button
+                <div className="flex shrink-0 flex-col gap-0.5 rounded-lg bg-ink-900/[.03] p-1">
+                  <StepButton
                     type="button"
                     onClick={() => move(i, -1)}
                     disabled={i === 0}
                     aria-label="Move up"
-                    className="rounded p-0.5 text-ink-500 hover:bg-ink-900/5 hover:text-ink-900 disabled:opacity-25"
                   >
                     <ChevronUp className="h-4 w-4" />
-                  </button>
-                  <button
+                  </StepButton>
+                  <StepButton
                     type="button"
                     onClick={() => move(i, 1)}
                     disabled={i === rows.length - 1}
                     aria-label="Move down"
-                    className="rounded p-0.5 text-ink-500 hover:bg-ink-900/5 hover:text-ink-900 disabled:opacity-25"
                   >
                     <ChevronDown className="h-4 w-4" />
-                  </button>
+                  </StepButton>
                 </div>
 
                 <div className="min-w-0 flex-1">{renderRow(row)}</div>
 
-                <div className="flex shrink-0 items-center gap-1">
-                  <button
+                <div className="flex shrink-0 items-center gap-1.5">
+                  {/* visible is the "on" state, so it carries the brand tint;
+                      hidden drops to neutral, which is the whole point of the
+                      control and now readable without hovering it */}
+                  <IconButton
                     type="button"
+                    tone="neutral"
+                    active={row.active !== false}
                     onClick={() => toggle(row)}
                     aria-label={row.active === false ? 'Show on website' : 'Hide from website'}
                     title={row.active === false ? 'Hidden — click to show' : 'Visible — click to hide'}
-                    className="rounded-xl p-2 text-ink-500 transition-colors hover:bg-ink-900/5 hover:text-ink-900"
                   >
                     {row.active === false ? (
                       <EyeOff className="h-4 w-4" />
                     ) : (
-                      <Eye className="h-4 w-4 text-brand-600" />
+                      <Eye className="h-4 w-4" />
                     )}
-                  </button>
-                  <button
+                  </IconButton>
+                  <IconButton
                     type="button"
                     onClick={() => setEditing(row)}
                     aria-label="Edit"
-                    className="rounded-xl p-2 text-ink-500 transition-colors hover:bg-brand-50 hover:text-brand-700"
+                    title="Edit"
                   >
                     <Pencil className="h-4 w-4" />
-                  </button>
-                  <button
+                  </IconButton>
+                  <IconButton
                     type="button"
+                    tone="danger"
                     onClick={() => setDeleting(row)}
                     aria-label="Delete"
-                    className="rounded-xl p-2 text-ink-500 transition-colors hover:bg-red-50 hover:text-red-600"
+                    title="Delete"
                   >
                     <Trash2 className="h-4 w-4" />
-                  </button>
+                  </IconButton>
                 </div>
               </li>
             ))}
@@ -356,7 +361,7 @@ export function Thumb({ src }) {
         />
       ) : (
         <ImageOff
-          className="h-4 w-4 text-brand-600/35"
+          className="h-4 w-4 text-brand-600/40"
           aria-label={src ? 'Image could not be loaded' : 'No image'}
         />
       )}

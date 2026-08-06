@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Clock, Link2, Phone, Plus, Trash2 } from 'lucide-react'
 import { api } from '@/lib/api'
-import { Button, Card, Field, Input, PageHeader, Toast } from '@/components/ui'
+import { Button, Card, Field, IconButton, Input, PageHeader, Toast } from '@/components/ui'
 
 /**
  * Contact details — one record, so a form rather than a list.
@@ -179,14 +179,16 @@ function RepeatingRows({ icon, title, hint, rows, columns, onChange, onAdd, onRe
                 onChange={(e) => onChange(i, { [c.key]: e.target.value })}
               />
             ))}
-            <button
+            <IconButton
               type="button"
+              tone="danger"
               onClick={() => onRemove(i)}
               aria-label={`Remove row ${i + 1}`}
-              className="shrink-0 rounded-xl p-2 text-ink-500 transition-colors hover:bg-red-50 hover:text-red-600"
+              title="Remove this row"
+              className="shrink-0"
             >
               <Trash2 className="h-4 w-4" />
-            </button>
+            </IconButton>
           </div>
         ))}
       </div>

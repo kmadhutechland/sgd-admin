@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Inbox, Mail, Phone, Trash2 } from 'lucide-react'
 import { api } from '@/lib/api'
-import { Button, ConfirmDelete, Empty, PageHeader, Toast, cn } from '@/components/ui'
+import { Button, ConfirmDelete, Empty, IconButton, PageHeader, Toast, cn } from '@/components/ui'
 
 /** Messages sent through the website's contact form. Read and delete only —
  *  these come from the public, so nothing here is editable. */
@@ -130,17 +130,18 @@ export default function EnquiriesPage() {
                         minute: '2-digit',
                       })}
                     </time>
-                    <button
+                    <IconButton
                       type="button"
+                      tone="danger"
                       onClick={(e) => {
                         e.stopPropagation()
                         setDeleting(row)
                       }}
                       aria-label="Delete message"
-                      className="rounded-lg p-2 text-ink-500 transition-colors hover:bg-red-50 hover:text-red-600"
+                      title="Delete message"
                     >
                       <Trash2 className="h-4 w-4" />
-                    </button>
+                    </IconButton>
                   </div>
                 </div>
 
