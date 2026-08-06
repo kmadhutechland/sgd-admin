@@ -10,6 +10,8 @@ const BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:4000'
  * seeded banner and team thumbnail was a broken image in the panel.
  */
 const SITE = import.meta.env.VITE_SITE_URL ?? 'http://localhost:5173'
+/** Exported so the panel can link out to the website it edits. */
+export const SITE_URL = SITE
 const TOKEN_KEY = 'sgd-admin-token'
 
 export const getToken = () => localStorage.getItem(TOKEN_KEY)

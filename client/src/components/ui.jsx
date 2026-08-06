@@ -10,19 +10,24 @@ export const cn = (...c) => c.filter(Boolean).join(' ')
 
 export function Button({ variant = 'primary', busy, children, className, ...rest }) {
   const styles = {
-    primary: 'bg-brand-600 text-white hover:bg-brand-700 disabled:bg-brand-600/50',
+    // the glow is what makes the primary action findable on a page of white
+    // cards — colour alone at this size reads as just another label
+    primary:
+      'bg-brand-600 text-white shadow-glow hover:bg-brand-700 hover:shadow-lift disabled:bg-brand-600/50 disabled:shadow-none',
     ghost: 'text-ink-600 hover:bg-ink-900/5',
     danger: 'text-red-600 hover:bg-red-50',
-    outline: 'border border-ink-900/15 text-ink-700 hover:border-ink-900/30 hover:bg-ink-900/[.03]',
+    outline:
+      'border border-ink-900/12 bg-white text-ink-700 shadow-sm hover:border-brand-500/40 hover:text-brand-700',
   }
   return (
     <button
       {...rest}
       disabled={busy || rest.disabled}
       className={cn(
-        'inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-[13.5px] font-semibold transition-colors duration-200',
+        'inline-flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-[13.5px] font-semibold',
+        'transition-all duration-200 active:scale-[.97]',
         'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500',
-        'disabled:cursor-not-allowed',
+        'disabled:cursor-not-allowed disabled:active:scale-100',
         styles[variant],
         className,
       )}
@@ -59,12 +64,12 @@ export function Field({ label, error, hint, children, required }) {
 }
 
 const inputBase =
-  'w-full rounded-lg border bg-white px-3 py-2.5 text-[14px] text-ink-900 outline-none transition-colors placeholder:text-ink-500/60 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20'
+  'w-full rounded-xl border bg-white px-3.5 py-2.5 text-[14px] text-ink-900 outline-none transition-all duration-200 placeholder:text-ink-500/50 hover:border-ink-900/25 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/12'
 
 export const Input = ({ error, className, ...rest }) => (
   <input
     {...rest}
-    className={cn(inputBase, error ? 'border-red-400' : 'border-ink-900/15', className)}
+    className={cn(inputBase, error ? 'border-red-400' : 'border-ink-900/12', className)}
   />
 )
 
@@ -72,14 +77,14 @@ export const Textarea = ({ error, rows = 4, className, ...rest }) => (
   <textarea
     {...rest}
     rows={rows}
-    className={cn(inputBase, 'resize-y', error ? 'border-red-400' : 'border-ink-900/15', className)}
+    className={cn(inputBase, 'resize-y', error ? 'border-red-400' : 'border-ink-900/12', className)}
   />
 )
 
 export const Select = ({ error, options = [], className, ...rest }) => (
   <select
     {...rest}
-    className={cn(inputBase, error ? 'border-red-400' : 'border-ink-900/15', className)}
+    className={cn(inputBase, error ? 'border-red-400' : 'border-ink-900/12', className)}
   >
     {options.map((o) => (
       <option key={o} value={o}>
@@ -140,7 +145,7 @@ export function ImageInput({ value, onChange, error }) {
   return (
     <div>
       <div className="flex items-start gap-3">
-        <div className="grid h-24 w-24 shrink-0 place-items-center overflow-hidden rounded-lg border border-ink-900/15 bg-ink-900/[.03]">
+        <div className="grid h-24 w-24 shrink-0 place-items-center overflow-hidden rounded-xl border border-ink-900/10 bg-brand-50/60">
           {value ? (
             <img src={mediaUrl(value)} alt="" className="h-full w-full object-cover" />
           ) : (
@@ -206,7 +211,7 @@ export function Modal({ open, title, onClose, children, wide }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-ink-950/50 p-4 backdrop-blur-sm sm:p-8"
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-ink-950/60 p-4 backdrop-blur-md sm:p-8"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
@@ -214,7 +219,7 @@ export function Modal({ open, title, onClose, children, wide }) {
     >
       <div
         className={cn(
-          'my-auto w-full rounded-2xl bg-white shadow-2xl',
+          'my-auto w-full animate-fade-up rounded-[1.25rem] bg-white shadow-2xl ring-1 ring-ink-900/5',
           wide ? 'max-w-3xl' : 'max-w-xl',
         )}
         onClick={(e) => e.stopPropagation()}
@@ -272,7 +277,7 @@ export function Toast({ message, onDone }) {
   return (
     <div
       role="status"
-      className="fixed bottom-5 left-1/2 z-[60] flex -translate-x-1/2 items-center gap-2 rounded-full bg-ink-900 px-4 py-2.5 text-[13.5px] font-medium text-white shadow-xl"
+      className="fixed bottom-5 left-1/2 z-[60] flex -translate-x-1/2 items-center gap-2 animate-fade-up rounded-full bg-ink-950 px-5 py-3 text-[13.5px] font-medium text-white shadow-xl"
     >
       <Check className="h-4 w-4 text-brand-400" />
       {message}
@@ -280,10 +285,70 @@ export function Toast({ message, onDone }) {
   )
 }
 
+/* ------------------------------------------------------------------ */
+/* Page furniture — shared so every screen is laid out identically      */
+/* ------------------------------------------------------------------ */
+
+/**
+ * The heading block at the top of every screen.
+ *
+ * `eyebrow` carries the status line — how many rows are live, how many
+ * enquiries are unread. It sits above the title rather than beside it so the
+ * answer to "is there anything to do here" arrives before the page name.
+ */
+export function PageHeader({ eyebrow, title, description, action }) {
+  return (
+    <header className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
+      <div className="min-w-0">
+        {eyebrow && (
+          <p className="flex items-center gap-2 font-display text-[11px] font-bold uppercase tracking-[.18em] text-brand-700">
+            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-volt-500" />
+            {eyebrow}
+          </p>
+        )}
+        <h1 className="mt-2.5 font-display text-[1.75rem] font-extrabold leading-tight tracking-tight text-ink-900">
+          {title}
+        </h1>
+        {description && (
+          <p className="mt-2 max-w-2xl text-[14px] leading-relaxed text-ink-500">{description}</p>
+        )}
+      </div>
+      {action}
+    </header>
+  )
+}
+
+/** A white panel. `title`/`icon` give it a labelled header strip. */
+export function Card({ icon: Icon, title, hint, children, className }) {
+  return (
+    <section
+      className={cn(
+        'overflow-hidden rounded-2xl border border-ink-900/[.07] bg-white shadow-card',
+        className,
+      )}
+    >
+      {title && (
+        <div className="flex items-start gap-3 border-b border-ink-900/[.07] bg-brand-50/40 px-6 py-4">
+          {Icon && (
+            <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-white text-brand-600 ring-1 ring-inset ring-brand-600/15">
+              <Icon className="h-4 w-4" />
+            </span>
+          )}
+          <div className="min-w-0">
+            <h2 className="font-display text-[14.5px] font-bold text-ink-900">{title}</h2>
+            {hint && <p className="mt-0.5 text-[12.5px] leading-relaxed text-ink-500">{hint}</p>}
+          </div>
+        </div>
+      )}
+      <div className="p-6">{children}</div>
+    </section>
+  )
+}
+
 export function Empty({ icon: Icon, title, hint, action }) {
   return (
     <div className="rounded-xl border border-dashed border-ink-900/15 px-6 py-14 text-center">
-      {Icon && <Icon className="mx-auto h-7 w-7 text-ink-500/40" />}
+      {Icon && <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-brand-50 text-brand-600 ring-1 ring-inset ring-brand-600/10"><Icon className="h-6 w-6" /></span>}
       <p className="mt-3 font-display text-[15px] font-bold text-ink-900">{title}</p>
       {hint && <p className="mx-auto mt-1.5 max-w-sm text-[13.5px] text-ink-500">{hint}</p>}
       {action && <div className="mt-5">{action}</div>}

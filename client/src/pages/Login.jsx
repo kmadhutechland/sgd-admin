@@ -25,19 +25,32 @@ export default function Login({ onSignedIn }) {
   }
 
   return (
-    <div className="grid min-h-screen place-items-center bg-ink-950 px-5">
-      <div className="w-full max-w-sm">
-        <div className="mb-7 text-center">
-          <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-brand-500/15 text-brand-400 ring-1 ring-inset ring-brand-400/25">
-            <Lock className="h-5 w-5" />
-          </span>
-          <h1 className="mt-4 font-display text-xl font-extrabold text-white">SGD Electric</h1>
-          <p className="mt-1 text-[13.5px] text-white/45">Website administration</p>
+    <div className="sidebar-sheen relative grid min-h-screen place-items-center overflow-hidden bg-ink-950 px-5">
+      {/* the same brand glow the sidebar carries, so signing in already looks
+          like the product rather than a generic gate in front of it */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-40 left-1/2 h-[34rem] w-[34rem] -translate-x-1/2 rounded-full bg-brand-600/20 blur-[130px]"
+      />
+
+      <div className="relative w-full max-w-sm animate-fade-up">
+        <div className="mb-8 text-center">
+          <img
+            src="/logo-reversed.png"
+            alt="SGD Electric"
+            width="1040"
+            height="514"
+            className="mx-auto h-11 w-auto"
+          />
+          <p className="mt-4 flex items-center justify-center gap-2 font-display text-[11px] font-bold uppercase tracking-[.2em] text-white/40">
+            <Lock className="h-3 w-3" />
+            Website administration
+          </p>
         </div>
 
         <form
           onSubmit={submit}
-          className="space-y-4 rounded-2xl border border-white/10 bg-white/[.04] p-6 backdrop-blur-sm"
+          className="space-y-4 rounded-[1.25rem] border border-white/10 bg-white/[.05] p-6 shadow-2xl backdrop-blur-md"
         >
           {error && (
             <p className="rounded-lg border border-red-400/30 bg-red-500/10 px-3.5 py-2.5 text-[13px] text-red-300">

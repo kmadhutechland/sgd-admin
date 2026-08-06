@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Plus, Trash2 } from 'lucide-react'
+import { Clock, Link2, Phone, Plus, Trash2 } from 'lucide-react'
 import { api } from '@/lib/api'
-import { Button, Field, Input, Toast } from '@/components/ui'
+import { Button, Card, Field, Input, PageHeader, Toast } from '@/components/ui'
 
 /**
  * Contact details — one record, so a form rather than a list.
@@ -60,55 +60,57 @@ export default function ContactPage() {
   }
 
   return (
-    <form onSubmit={save} className="max-w-3xl">
-      <header>
-        <h1 className="font-display text-2xl font-extrabold tracking-tight text-ink-900">
-          Contact details
-        </h1>
-        <p className="mt-1.5 text-[14px] leading-relaxed text-ink-500">
-          These appear in the website footer, on the contact page and anywhere a phone number or
-          address is shown.
-        </p>
-      </header>
+    <form onSubmit={save} className="max-w-3xl pb-24">
+      <PageHeader
+        eyebrow="Shown across the whole website"
+        title="Contact details"
+        description="These appear in the website footer, on the contact page and anywhere a phone number or address is shown."
+      />
 
       {errors._ && (
-        <p className="mt-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-[13.5px] text-red-700">
+        <p className="mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-[13.5px] text-red-700">
           {errors._}
         </p>
       )}
 
-      <div className="mt-7 space-y-5 rounded-xl border border-ink-900/10 bg-white p-6">
-        <div className="grid gap-5 sm:grid-cols-2">
-          <Field label="Phone number" error={errors.phone}>
-            <Input value={form.phone} onChange={(e) => set('phone', e.target.value)} />
-          </Field>
-          <Field
-            label="Phone link"
-            hint="What the number dials when tapped on a phone"
-            error={errors.phoneHref}
-          >
-            <Input
-              value={form.phoneHref}
-              onChange={(e) => set('phoneHref', e.target.value)}
-              placeholder="tel:+918500085120"
-            />
-          </Field>
-        </div>
+      <div className="mt-7 space-y-5">
+        <Card icon={Phone} title="How people reach you" hint="The number, address and inbox shown on the site.">
+          <div className="space-y-5">
+            <div className="grid gap-5 sm:grid-cols-2">
+              <Field label="Phone number" error={errors.phone}>
+                <Input value={form.phone} onChange={(e) => set('phone', e.target.value)} />
+              </Field>
+              <Field
+                label="Phone link"
+                hint="What the number dials when tapped on a phone"
+                error={errors.phoneHref}
+              >
+                <Input
+                  value={form.phoneHref}
+                  onChange={(e) => set('phoneHref', e.target.value)}
+                  placeholder="tel:+918500085120"
+                />
+              </Field>
+            </div>
 
-        <Field label="Email address" error={errors.email}>
-          <Input type="email" value={form.email} onChange={(e) => set('email', e.target.value)} />
-        </Field>
+            <Field label="Email address" error={errors.email}>
+              <Input type="email" value={form.email} onChange={(e) => set('email', e.target.value)} />
+            </Field>
 
-        <Field label="Head office address" error={errors.address}>
-          <Input value={form.address} onChange={(e) => set('address', e.target.value)} />
-        </Field>
-
-        <Field label="City" error={errors.city}>
-          <Input value={form.city} onChange={(e) => set('city', e.target.value)} />
-        </Field>
+            <div className="grid gap-5 sm:grid-cols-[1fr_12rem]">
+              <Field label="Head office address" error={errors.address}>
+                <Input value={form.address} onChange={(e) => set('address', e.target.value)} />
+              </Field>
+              <Field label="City" error={errors.city}>
+                <Input value={form.city} onChange={(e) => set('city', e.target.value)} />
+              </Field>
+            </div>
+          </div>
+        </Card>
       </div>
 
       <RepeatingRows
+        icon={Clock}
         title="Opening hours"
         hint="One row per line shown on the site — for example Office, 10:00 AM – 7:00 PM."
         rows={form.hours}
@@ -123,6 +125,7 @@ export default function ContactPage() {
       />
 
       <RepeatingRows
+        icon={Link2}
         title="Social links"
         hint="The icon name must be one the site knows: Linkedin, Instagram, Youtube, Twitter or Facebook."
         rows={form.socials}
@@ -137,10 +140,18 @@ export default function ContactPage() {
         addLabel="Add social link"
       />
 
-      <div className="mt-7 flex justify-end">
-        <Button type="submit" busy={busy}>
-          Save changes
-        </Button>
+      {/*
+        The save bar is fixed rather than sitting at the foot of the form. This
+        page is long enough to scroll on a laptop, and a button below the last
+        repeating row is out of sight exactly when it is needed.
+      */}
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-ink-900/[.07] bg-white/85 px-5 py-3.5 backdrop-blur-md sm:left-64">
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-4">
+          <p className="text-[12.5px] text-ink-500">Changes reach the website as soon as you save.</p>
+          <Button type="submit" busy={busy}>
+            Save changes
+          </Button>
+        </div>
       </div>
 
       <Toast message={toast} onDone={() => setToast('')} />
@@ -148,15 +159,12 @@ export default function ContactPage() {
   )
 }
 
-function RepeatingRows({ title, hint, rows, columns, onChange, onAdd, onRemove, addLabel }) {
+function RepeatingRows({ icon, title, hint, rows, columns, onChange, onAdd, onRemove, addLabel }) {
   return (
-    <section className="mt-6 rounded-xl border border-ink-900/10 bg-white p-6">
-      <h2 className="font-display text-[15px] font-bold text-ink-900">{title}</h2>
-      <p className="mt-1 text-[13px] text-ink-500">{hint}</p>
-
-      <div className="mt-4 space-y-2">
+    <Card icon={icon} title={title} hint={hint} className="mt-5">
+      <div className="space-y-2.5">
         {rows.length === 0 && (
-          <p className="rounded-lg border border-dashed border-ink-900/15 px-4 py-6 text-center text-[13px] text-ink-500">
+          <p className="rounded-xl border border-dashed border-brand-600/25 bg-brand-50/40 px-4 py-7 text-center text-[13px] text-ink-500">
             Nothing here yet.
           </p>
         )}
@@ -175,7 +183,7 @@ function RepeatingRows({ title, hint, rows, columns, onChange, onAdd, onRemove, 
               type="button"
               onClick={() => onRemove(i)}
               aria-label={`Remove row ${i + 1}`}
-              className="shrink-0 rounded-lg p-2 text-ink-500 transition-colors hover:bg-red-50 hover:text-red-600"
+              className="shrink-0 rounded-xl p-2 text-ink-500 transition-colors hover:bg-red-50 hover:text-red-600"
             >
               <Trash2 className="h-4 w-4" />
             </button>
@@ -183,10 +191,10 @@ function RepeatingRows({ title, hint, rows, columns, onChange, onAdd, onRemove, 
         ))}
       </div>
 
-      <Button type="button" variant="outline" onClick={onAdd} className="mt-3">
+      <Button type="button" variant="outline" onClick={onAdd} className="mt-4">
         <Plus className="h-3.5 w-3.5" />
         {addLabel}
       </Button>
-    </section>
+    </Card>
   )
 }

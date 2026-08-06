@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Inbox, Mail, Phone, Trash2 } from 'lucide-react'
 import { api } from '@/lib/api'
-import { Button, ConfirmDelete, Empty, Toast, cn } from '@/components/ui'
+import { Button, ConfirmDelete, Empty, PageHeader, Toast, cn } from '@/components/ui'
 
 /** Messages sent through the website's contact form. Read and delete only —
  *  these come from the public, so nothing here is editable. */
@@ -47,19 +47,17 @@ export default function EnquiriesPage() {
 
   return (
     <div>
-      <header>
-        <h1 className="font-display text-2xl font-extrabold tracking-tight text-ink-900">
-          Enquiries
-          {unread > 0 && (
-            <span className="ml-3 rounded-full bg-brand-600 px-2.5 py-1 align-middle text-[12px] font-bold text-white">
-              {unread} new
-            </span>
-          )}
-        </h1>
-        <p className="mt-1.5 text-[14px] leading-relaxed text-ink-500">
-          Messages sent through the contact form on the website.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow={
+          rows === null
+            ? 'Loading'
+            : unread > 0
+              ? `${unread} waiting for a reply`
+              : `${rows.length} message${rows.length === 1 ? '' : 's'}, all read`
+        }
+        title="Enquiries"
+        description="Messages sent through the contact form on the website. Opening one marks it as read."
+      />
 
       <div className="mt-6">
         {rows === null ? (
@@ -77,10 +75,21 @@ export default function EnquiriesPage() {
                 key={row.id}
                 onClick={() => markRead(row)}
                 className={cn(
-                  'cursor-default rounded-xl border bg-white p-4 transition-colors',
-                  row.read ? 'border-ink-900/10' : 'border-brand-300 bg-brand-50/40',
+                  'relative cursor-default overflow-hidden rounded-2xl border bg-white p-4 pl-5 shadow-card',
+                  'transition-all duration-200 hover:-translate-y-px hover:shadow-lift',
+                  row.read
+                    ? 'border-ink-900/[.07]'
+                    : 'border-brand-400/40 bg-brand-50/50 shadow-glow',
                 )}
               >
+                {/* an unread message gets a lime edge, the same signal the
+                    sidebar uses for "you are here" */}
+                {!row.read && (
+                  <span
+                    aria-hidden="true"
+                    className="absolute inset-y-0 left-0 w-[3px] bg-volt-500"
+                  />
+                )}
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="flex items-center gap-2 font-display text-[15px] font-bold text-ink-900">

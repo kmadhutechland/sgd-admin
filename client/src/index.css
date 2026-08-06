@@ -4,7 +4,42 @@
 
 @layer base {
   body {
-    @apply bg-[#F7F9F8] text-ink-900 font-sans antialiased;
+    /* a faint green cast rather than neutral grey — the panel should feel like
+       it belongs to the same brand as the website, even before any green shows */
+    @apply bg-[#F4F8F5] text-ink-900 font-sans antialiased;
   }
-  h1, h2 { @apply font-display; }
+  h1,
+  h2 {
+    @apply font-display;
+  }
+
+  /* a slim scrollbar, so the dark sidebar does not get a light grey gutter */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(6, 18, 12, 0.18) transparent;
+  }
+  ::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-ink-900/15;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-ink-900/25;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+@layer components {
+  /* The sidebar's backdrop: a deep ink field with a brand glow bled in from the
+     top, so it reads as brand-coloured without tinting the whole surface green
+     and fighting the content area beside it. */
+  .sidebar-sheen {
+    background-image:
+      radial-gradient(120% 55% at 50% 0%, rgba(18, 183, 106, 0.22), transparent 70%),
+      radial-gradient(90% 40% at 0% 100%, rgba(191, 247, 0, 0.07), transparent 70%);
+  }
 }

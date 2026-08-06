@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { ChevronDown, ChevronUp, Eye, EyeOff, Pencil, Plus, Trash2 } from 'lucide-react'
+import { ChevronDown, ChevronUp, Eye, EyeOff, ImageOff, Pencil, Plus, Trash2 } from 'lucide-react'
 import { api, mediaUrl } from '@/lib/api'
 import {
   Button,
@@ -9,6 +9,7 @@ import {
   ImageInput,
   Input,
   Modal,
+  PageHeader,
   Select,
   Stars,
   Textarea,
@@ -112,18 +113,24 @@ export default function ResourcePage({
 
   return (
     <div>
-      <header className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="font-display text-2xl font-extrabold tracking-tight text-ink-900">
-            {title}
-          </h1>
-          <p className="mt-1.5 max-w-2xl text-[14px] leading-relaxed text-ink-500">{description}</p>
-        </div>
-        <Button onClick={() => setEditing({})}>
-          <Plus className="h-4 w-4" />
-          {addLabel}
-        </Button>
-      </header>
+      {/* the count sits in the eyebrow rather than beside the heading — it
+          answers "is anything here" before the eye reaches the list, and it
+          counts what is actually visible rather than what merely exists */}
+      <PageHeader
+        eyebrow={
+          rows === null
+            ? 'Loading'
+            : `${rows.filter((r) => r.active !== false).length} live on the website`
+        }
+        title={title}
+        description={description}
+        action={
+          <Button onClick={() => setEditing({})}>
+            <Plus className="h-4 w-4" />
+            {addLabel}
+          </Button>
+        }
+      />
 
       {error && (
         <p className="mt-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-[13.5px] text-red-700">
@@ -147,13 +154,16 @@ export default function ResourcePage({
             }
           />
         ) : (
-          <ul className="space-y-2">
+          <ul className="space-y-2.5">
             {rows.map((row, i) => (
               <li
                 key={row.id}
                 className={cn(
-                  'flex items-center gap-4 rounded-xl border border-ink-900/10 bg-white p-3 transition-opacity',
-                  row.active === false && 'opacity-55',
+                  'group/row flex items-center gap-4 rounded-2xl border border-ink-900/[.07] bg-white p-3 shadow-card',
+                  'transition-all duration-200 hover:-translate-y-px hover:border-brand-500/25 hover:shadow-lift',
+                  // hidden rows are dimmed and desaturated, so "not on the site"
+                  // is legible at a glance rather than needing the eye icon read
+                  row.active === false && 'opacity-60 grayscale',
                 )}
               >
                 {/* order controls — buttons rather than drag, so this works on a
@@ -187,7 +197,7 @@ export default function ResourcePage({
                     onClick={() => toggle(row)}
                     aria-label={row.active === false ? 'Show on website' : 'Hide from website'}
                     title={row.active === false ? 'Hidden — click to show' : 'Visible — click to hide'}
-                    className="rounded-lg p-2 text-ink-500 transition-colors hover:bg-ink-900/5 hover:text-ink-900"
+                    className="rounded-xl p-2 text-ink-500 transition-colors hover:bg-ink-900/5 hover:text-ink-900"
                   >
                     {row.active === false ? (
                       <EyeOff className="h-4 w-4" />
@@ -199,7 +209,7 @@ export default function ResourcePage({
                     type="button"
                     onClick={() => setEditing(row)}
                     aria-label="Edit"
-                    className="rounded-lg p-2 text-ink-500 transition-colors hover:bg-ink-900/5 hover:text-ink-900"
+                    className="rounded-xl p-2 text-ink-500 transition-colors hover:bg-brand-50 hover:text-brand-700"
                   >
                     <Pencil className="h-4 w-4" />
                   </button>
@@ -207,7 +217,7 @@ export default function ResourcePage({
                     type="button"
                     onClick={() => setDeleting(row)}
                     aria-label="Delete"
-                    className="rounded-lg p-2 text-ink-500 transition-colors hover:bg-red-50 hover:text-red-600"
+                    className="rounded-xl p-2 text-ink-500 transition-colors hover:bg-red-50 hover:text-red-600"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -328,9 +338,28 @@ function RowForm({ open, row, fields, title, busy, onSave, onClose }) {
 
 /** Small helper used by the row summaries. */
 export function Thumb({ src }) {
+  const [failed, setFailed] = useState(false)
+
   return (
-    <div className="h-12 w-16 shrink-0 overflow-hidden rounded-lg bg-ink-900/5">
-      {src ? <img src={mediaUrl(src)} alt="" className="h-full w-full object-cover" /> : null}
+    <div className="grid h-12 w-16 shrink-0 place-items-center overflow-hidden rounded-xl bg-brand-50 ring-1 ring-inset ring-ink-900/[.06]">
+      {/*
+        A dead image used to render as an unexplained grey rectangle. Saying so
+        matters here: the usual cause is a file the website serves rather than
+        the API, which looks identical to "no image set" if nothing is drawn.
+      */}
+      {src && !failed ? (
+        <img
+          src={mediaUrl(src)}
+          alt=""
+          onError={() => setFailed(true)}
+          className="h-full w-full object-cover"
+        />
+      ) : (
+        <ImageOff
+          className="h-4 w-4 text-brand-600/35"
+          aria-label={src ? 'Image could not be loaded' : 'No image'}
+        />
+      )}
     </div>
   )
 }
