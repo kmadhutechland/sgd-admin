@@ -148,6 +148,36 @@ export const Select = ({ error, options = [], className, ...rest }) => (
   </select>
 )
 
+/** A yes/no switch. A real checkbox underneath, so it is keyboard-operable. */
+export function Toggle({ checked, onChange, label }) {
+  return (
+    <label className="inline-flex cursor-pointer select-none items-center gap-3">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+        className="peer sr-only"
+      />
+      <span
+        aria-hidden="true"
+        className={cn(
+          'relative h-6 w-11 shrink-0 rounded-full transition-colors duration-200',
+          'peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-brand-500',
+          checked ? 'bg-brand-600' : 'bg-ink-900/15',
+        )}
+      >
+        <span
+          className={cn(
+            'absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-200',
+            checked ? 'translate-x-[1.375rem]' : 'translate-x-0.5',
+          )}
+        />
+      </span>
+      {label && <span className="text-[13.5px] text-ink-600">{label}</span>}
+    </label>
+  )
+}
+
 /** A star rating that is still operable from the keyboard. */
 export function Stars({ value, onChange }) {
   return (

@@ -33,6 +33,7 @@ const EMPTY = {
   team: [],
   gallery: [],
   reviews: [],
+  plans: [],
   enquiries: [],
   // single-row tables, kept as objects rather than arrays of one
   settings: {},

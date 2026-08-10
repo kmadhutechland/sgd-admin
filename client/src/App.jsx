@@ -4,11 +4,13 @@ import {
   ExternalLink,
   GalleryHorizontalEnd,
   Images,
+  IndianRupee,
   Inbox,
   LogOut,
   MapPin,
   Menu,
   MessageSquareQuote,
+  ShieldCheck,
   Users,
   X,
 } from 'lucide-react'
@@ -17,6 +19,7 @@ import { api, clearToken, getToken } from '@/lib/api'
 import ResourcePage, { Thumb } from '@/components/ResourcePage'
 import ContactPage from '@/pages/ContactPage'
 import EnquiriesPage from '@/pages/EnquiriesPage'
+import AccountPage from '@/pages/AccountPage'
 import Login from '@/pages/Login'
 import { cn } from '@/components/ui'
 
@@ -132,13 +135,95 @@ const REVIEWS = {
   ),
 }
 
+/** ₹ with thousands separators, matching how the website prints a price. */
+const rupees = (n) => `₹${Number(n || 0).toLocaleString('en-IN')}`
+
+const PERIOD_LABEL = { hour: 'per hour', day: 'per day', week: 'per week', month: 'per month' }
+
+const PLANS = {
+  resource: 'plans',
+  title: 'Rental plans',
+  icon: IndianRupee,
+  addLabel: 'Add plan',
+  description:
+    'What a vehicle costs to rent, by hour, day, week or month. These appear as the pricing cards on the home page, in the order below.',
+  fields: [
+    { name: 'name', label: 'Plan name', required: true, placeholder: 'Daily rental' },
+    {
+      name: 'period',
+      label: 'Billing period',
+      type: 'select',
+      options: ['hour', 'day', 'week', 'month'],
+      default: 'day',
+      hint: 'How often the price is charged.',
+    },
+    {
+      name: 'price',
+      label: 'Price (₹)',
+      type: 'number',
+      required: true,
+      placeholder: '129',
+      hint: 'Numbers only — the website adds the ₹ and the period.',
+    },
+    {
+      name: 'wasPrice',
+      label: 'Was (₹)',
+      type: 'number',
+      placeholder: '0',
+      hint: 'Shown struck through beside the price. Leave at 0 for no discount.',
+    },
+    { name: 'vehicle', label: 'Vehicle', placeholder: 'SGD City 25' },
+    { name: 'note', label: 'Short note', placeholder: 'All-inclusive, cancel any day' },
+    {
+      name: 'includes',
+      label: "What's included",
+      type: 'textarea',
+      placeholder: 'Insurance included\nServicing and spares\nRoadside assistance',
+      hint: 'One per line. Each line becomes a ticked item on the card.',
+    },
+    {
+      name: 'featured',
+      label: 'Highlight this plan',
+      type: 'toggle',
+      toggleLabel: 'Show as the recommended plan',
+      hint: 'Only mark one — it is drawn larger and in the brand colour.',
+    },
+  ],
+  renderRow: (p) => (
+    <div className="min-w-0">
+      <p className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 font-display text-[14.5px] font-bold text-ink-900">
+        {p.name}
+        <span className="text-brand-700">{rupees(p.price)}</span>
+        <span className="text-[12.5px] font-normal text-ink-500">
+          {PERIOD_LABEL[p.period] ?? p.period}
+        </span>
+        {p.wasPrice > 0 && (
+          <span className="text-[12.5px] font-normal text-ink-500 line-through">
+            {rupees(p.wasPrice)}
+          </span>
+        )}
+        {p.featured && (
+          <span className="rounded-full bg-volt-500/20 px-2 py-0.5 text-[10.5px] font-bold uppercase tracking-wider text-brand-800">
+            Highlighted
+          </span>
+        )}
+      </p>
+      <p className="mt-0.5 truncate text-[13px] text-ink-500">
+        {[p.vehicle, p.note].filter(Boolean).join(' · ') || 'No vehicle or note set'}
+      </p>
+    </div>
+  ),
+}
+
 const NAV = [
   { to: '/banners', label: 'Banners', icon: GalleryHorizontalEnd },
   { to: '/team', label: 'Team', icon: Users },
   { to: '/gallery', label: 'Gallery', icon: Images },
   { to: '/reviews', label: 'Reviews', icon: MessageSquareQuote },
+  { to: '/plans', label: 'Rental plans', icon: IndianRupee },
   { to: '/contact', label: 'Contact details', icon: MapPin },
   { to: '/enquiries', label: 'Enquiries', icon: Inbox },
+  { to: '/account', label: 'Account', icon: ShieldCheck },
 ]
 
 /* ------------------------------------------------------------------ */
@@ -187,8 +272,10 @@ export default function App() {
             <Route path="/team" element={<ResourcePage {...TEAM} />} />
             <Route path="/gallery" element={<ResourcePage {...GALLERY} />} />
             <Route path="/reviews" element={<ResourcePage {...REVIEWS} />} />
+              <Route path="/plans" element={<ResourcePage {...PLANS} />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/enquiries" element={<EnquiriesPage />} />
+              <Route path="/account" element={<AccountPage user={user} />} />
               <Route path="*" element={<Navigate to="/banners" replace />} />
             </Routes>
           </div>

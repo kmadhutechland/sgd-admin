@@ -41,6 +41,30 @@ export async function verify(email, password) {
   return ok && user ? user : null
 }
 
+/**
+ * Change a signed-in user's password.
+ *
+ * The current password is required even though the caller already holds a valid
+ * token — a token can be a borrowed laptop with an open tab, and changing the
+ * password is exactly the move that locks the real owner out.
+ *
+ * Returns { ok } or { error }, so the route does not have to distinguish
+ * "wrong password" from "no such user" itself.
+ */
+export async function changePassword(userId, currentPassword, newPassword) {
+  const users = rawUsers()
+  const i = users.findIndex((u) => u.id === userId)
+  if (i === -1) return { error: 'Account not found' }
+
+  const ok = await bcrypt.compare(currentPassword, users[i].passwordHash)
+  if (!ok) return { error: 'That is not your current password' }
+
+  users[i].passwordHash = await bcrypt.hash(newPassword, 10)
+  users[i].updatedAt = new Date().toISOString()
+  saveUsers(users)
+  return { ok: true }
+}
+
 export function issueToken(user) {
   return jwt.sign({ sub: user.id, email: user.email, name: user.name }, JWT_SECRET, {
     expiresIn: TOKEN_TTL,

@@ -15,6 +15,7 @@ import {
   Stars,
   StepButton,
   Textarea,
+  Toggle,
   Toast,
   cn,
 } from '@/components/ui'
@@ -317,6 +318,23 @@ function RowForm({ open, row, fields, title, busy, onSave, onClose }) {
               />
             ) : f.type === 'stars' ? (
               <Stars value={Number(values[f.name]) || 5} onChange={(v) => set(f.name, v)} />
+            ) : f.type === 'toggle' ? (
+              <Toggle
+                checked={!!values[f.name]}
+                onChange={(v) => set(f.name, v)}
+                label={f.toggleLabel}
+              />
+            ) : f.type === 'number' ? (
+              <Input
+                type="number"
+                inputMode="decimal"
+                min="0"
+                step="1"
+                value={values[f.name] ?? ''}
+                onChange={(e) => set(f.name, e.target.value)}
+                error={errors[f.name]}
+                placeholder={f.placeholder}
+              />
             ) : (
               <Input
                 value={values[f.name]}

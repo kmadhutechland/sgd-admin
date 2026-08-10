@@ -7,7 +7,7 @@ import multer from 'multer'
 import { z } from 'zod'
 
 import { collection, singleton, changes, changedAt } from './store.js'
-import { requireAuth, verify, issueToken, IS_DEFAULT_SECRET } from './auth.js'
+import { requireAuth, verify, issueToken, changePassword, IS_DEFAULT_SECRET } from './auth.js'
 
 const HERE = path.dirname(fileURLToPath(import.meta.url))
 // overridable for the same reason as DATA_DIR: on a host these have to sit on a
@@ -60,6 +60,7 @@ const banners = collection('banners')
 const team = collection('team')
 const gallery = collection('gallery')
 const reviews = collection('reviews')
+const plans = collection('plans')
 const enquiries = collection('enquiries')
 const contact = singleton('contact')
 
@@ -94,6 +95,30 @@ const schemas = {
     active: z.boolean().optional(),
     position: z.number().int().optional(),
   }),
+  /*
+   * Rental plans.
+   *
+   * `price` is a number and `period` names the unit, rather than one "₹129/day"
+   * string. Two reasons: the site can format the currency itself, and sorting or
+   * comparing plans is impossible once the number is glued to its label.
+   */
+  plans: z.object({
+    name: z.string().min(1, 'Plan name is required'),
+    period: z.enum(['hour', 'day', 'week', 'month'], {
+      errorMap: () => ({ message: 'Choose hour, day, week or month' }),
+    }),
+    price: z.coerce.number().min(0, 'Price cannot be negative'),
+    // struck-through "was" price; 0 or blank means there is no discount to show
+    wasPrice: z.coerce.number().min(0).optional().default(0),
+    vehicle: z.string().optional().default(''),
+    note: z.string().optional().default(''),
+    // one plan per screen may be marked as the one to pick
+    featured: z.boolean().optional().default(false),
+    // free text, one per line, rendered as a tick list
+    includes: z.string().optional().default(''),
+    active: z.boolean().optional(),
+    position: z.number().int().optional(),
+  }),
 }
 
 const contactSchema = z.object({
@@ -118,7 +143,24 @@ function fieldErrors(err) {
  *
  * Reads are public so the website can render from them; writes need a token.
  */
-function crud(name, store, schema) {
+function crud(name, store, schema, { exclusive } = {}) {
+  /**
+   * Keep an "only one of these" flag honest.
+   *
+   * The plans form says to highlight only one plan, but nothing enforced it, so
+   * two could be marked and the page drew two "most popular" cards. Setting it
+   * on one row now clears it on the rest — the rule belongs here rather than in
+   * a note the editor has to remember.
+   */
+  const enforceExclusive = (savedRow) => {
+    if (!exclusive || !savedRow?.[exclusive]) return
+    for (const other of store.all()) {
+      if (other.id !== savedRow.id && other[exclusive]) {
+        store.update(other.id, { [exclusive]: false })
+      }
+    }
+  }
+
   app.get(`/api/${name}`, (req, res) => {
     // the public site asks for ?active=1; the admin wants everything
     res.json(store.all({ activeOnly: req.query.active === '1' }))
@@ -127,15 +169,35 @@ function crud(name, store, schema) {
   app.post(`/api/${name}`, requireAuth, (req, res) => {
     const parsed = schema.safeParse(req.body)
     if (!parsed.success) return res.status(422).json({ errors: fieldErrors(parsed.error) })
-    res.status(201).json(store.create({ active: true, ...parsed.data }))
+    const created = store.create({ active: true, ...parsed.data })
+    enforceExclusive(created)
+    res.status(201).json(created)
   })
 
   app.put(`/api/${name}/:id`, requireAuth, (req, res) => {
     // partial() so a toggle can send just { active: false }
     const parsed = schema.partial().safeParse(req.body)
     if (!parsed.success) return res.status(422).json({ errors: fieldErrors(parsed.error) })
-    const row = store.update(req.params.id, parsed.data)
+
+    /*
+     * Write back only what was actually sent.
+     *
+     * partial() makes every field optional but does NOT drop its .default(), so
+     * Zod helpfully fills in the missing ones — and `{ active: false }` from the
+     * hide button came back as a full object that blanked the row's bio, photo,
+     * note and everything else with a default. Hiding a team member erased their
+     * photograph.
+     *
+     * Keying off req.body rather than the parsed result keeps the validation and
+     * loses the invented values.
+     */
+    const sent = Object.keys(req.body ?? {})
+    const patch = {}
+    for (const key of sent) if (key in parsed.data) patch[key] = parsed.data[key]
+
+    const row = store.update(req.params.id, patch)
     if (!row) return res.status(404).json({ error: 'Not found' })
+    enforceExclusive(row)
     res.json(row)
   })
 
@@ -155,6 +217,7 @@ crud('banners', banners, schemas.banners)
 crud('team', team, schemas.team)
 crud('gallery', gallery, schemas.gallery)
 crud('reviews', reviews, schemas.reviews)
+crud('plans', plans, schemas.plans, { exclusive: 'featured' })
 
 /* ------------------------------------------------------------------ */
 /* Contact — one row, plus the enquiries the public form produces       */
@@ -218,6 +281,35 @@ app.post('/api/login', async (req, res) => {
 })
 
 app.get('/api/me', requireAuth, (req, res) => res.json({ user: req.user }))
+
+/**
+ * Change your own password.
+ *
+ * Twelve characters rather than the usual eight: there is no rate limiting on
+ * the login route yet, so length is the only thing standing between this panel
+ * and an unlimited guessing loop.
+ */
+app.put('/api/me/password', requireAuth, async (req, res) => {
+  const parsed = z
+    .object({
+      currentPassword: z.string().min(1, 'Enter your current password'),
+      newPassword: z.string().min(12, 'Use at least 12 characters'),
+    })
+    .safeParse(req.body)
+  if (!parsed.success) return res.status(422).json({ errors: fieldErrors(parsed.error) })
+
+  const { currentPassword, newPassword } = parsed.data
+  if (currentPassword === newPassword) {
+    return res.status(422).json({ errors: { newPassword: 'That is your current password' } })
+  }
+
+  const result = await changePassword(req.user.sub, currentPassword, newPassword)
+  if (result.error) return res.status(422).json({ errors: { currentPassword: result.error } })
+
+  // the existing token stays valid — signing the editor out of the tab they just
+  // used to change it would be a confusing way to confirm success
+  res.json({ ok: true })
+})
 
 app.post('/api/upload', requireAuth, (req, res) => {
   upload.single('file')(req, res, (err) => {
