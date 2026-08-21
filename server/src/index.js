@@ -361,6 +361,10 @@ app.get('/api/stream', (req, res) => {
   })
 })
 
+app.get('/', (_req, res) =>
+  res.json({ name: 'SGD Electric Admin API', status: 'running' }),
+)
+
 app.get('/api/health', (_req, res) =>
   res.json({ ok: true, counts: {
     banners: banners.all().length,
