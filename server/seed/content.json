@@ -13,8 +13,8 @@
       "position": 1
     },
     {
-      "image": "/media/banner-car.jpg",
-      "alt": "A green SGD Electric car",
+      "image": "/media/sgd-auto.webp",
+      "alt": "An SGD Electric 3-wheeler cargo auto",
       "active": true,
       "position": 2
     }
@@ -154,7 +154,7 @@
   "reviews": [
     {
       "name": "Arun P.",
-      "city": "Chennai",
+      "city": "Hyderabad",
       "stars": 5,
       "text": "Switched three months back. My fuel bill was ₹9,000 a month. Now it is nothing.",
       "active": true,
@@ -170,7 +170,7 @@
     },
     {
       "name": "Deepak R.",
-      "city": "Noida",
+      "city": "Vizag",
       "stars": 5,
       "text": "My scooter failed on a Tuesday. They handed me another one the same morning.",
       "active": true,
@@ -178,7 +178,7 @@
     },
     {
       "name": "Kavita M.",
-      "city": "Pune",
+      "city": "Bengaluru",
       "stars": 5,
       "text": "No licence needed on the low-speed model. That is the only reason I could start.",
       "active": true,
@@ -186,7 +186,7 @@
     },
     {
       "name": "Sameer T.",
-      "city": "Mumbai",
+      "city": "Tirupathi",
       "stars": 5,
       "text": "Earnings land in my account every night. No arguments, no follow-up calls.",
       "active": true,
@@ -194,7 +194,7 @@
     },
     {
       "name": "Rohit K.",
-      "city": "Jaipur",
+      "city": "Eluru",
       "stars": 4,
       "text": "Insurance was already included. I did not expect that at this rental price.",
       "active": true,
@@ -202,7 +202,7 @@
     },
     {
       "name": "Nasir A.",
-      "city": "Ahmedabad",
+      "city": "Hyderabad",
       "stars": 5,
       "text": "I run eight vehicles now. The dashboard tells me which one is idle before I ask.",
       "active": true,
@@ -218,7 +218,7 @@
     },
     {
       "name": "Gurpreet S.",
-      "city": "Delhi NCR",
+      "city": "Vizag",
       "stars": 5,
       "text": "Two years on the platform and not one day lost to a breakdown.",
       "active": true,
@@ -226,7 +226,7 @@
     },
     {
       "name": "Manoj B.",
-      "city": "Lucknow",
+      "city": "Tirupathi",
       "stars": 5,
       "text": "Rent to own means it becomes mine. My father did not believe me until he saw the papers.",
       "active": true,
@@ -242,7 +242,7 @@
     },
     {
       "name": "Imtiaz H.",
-      "city": "Kolkata",
+      "city": "Eluru",
       "stars": 5,
       "text": "A full day of riding costs me about ₹20 to charge. Petrol was ₹300.",
       "active": true,
