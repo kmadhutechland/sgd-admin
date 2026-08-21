@@ -17,7 +17,14 @@ services:
     plan: starter
     rootDir: server
     buildCommand: npm install
-    startCommand: npm start
+    # Seeding runs at start, not in the build, because Render does not mount the
+    # disk until the service boots — seeding during the build would write the
+    # database to a filesystem that is thrown away, and the service would come
+    # up with empty tables and no admin account.
+    #
+    # Safe on every restart: seed.js returns immediately once an admin account
+    # exists, so it populates the disk on first boot and no-ops forever after.
+    startCommand: npm run seed && npm start
     healthCheckPath: /api/health
     envVars:
       # signs admin login tokens — generated once, never in the repository

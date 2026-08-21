@@ -1,0 +1,7 @@
+# SPA fallback — every route is handled by React Router.
+#
+# Without this, a static host serves index.html for / but looks for a real file
+# at /enquiries or /contact, so refreshing anywhere except the root returns 404.
+# Netlify and Render both read this file; vercel.json alongside it does the same
+# job on Vercel only.
+/*  /index.html  200
