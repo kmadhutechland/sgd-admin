@@ -23,10 +23,50 @@
     {
       "name": "Barupati Srikanth",
       "role": "Founder & Chief Executive",
-      "bio": "",
+      "bio": "Previously built the last-mile network at a national logistics firm. Believes rider economics, not vehicle specs, decide whether EVs win.",
       "photo": "/media/founder.jpg",
       "active": true,
       "position": 0
+    },
+    {
+      "name": "Meera Krishnan",
+      "role": "Co-founder & Chief Technology Officer",
+      "bio": "Ex-payments infrastructure engineer. Architected SGD OS and the telematics stack that keeps the fleet observable in real time.",
+      "photo": "https://images.pexels.com/photos/34381970/pexels-photo-34381970.jpeg?auto=compress&cs=tinysrgb&w=400",
+      "active": true,
+      "position": 1
+    },
+    {
+      "name": "Sanjay Gupta",
+      "role": "Chief Operating Officer",
+      "bio": "Twenty years running distribution networks across tier-2 and tier-3 India. Owns the hub and swap-station rollout.",
+      "photo": "https://images.pexels.com/photos/15854251/pexels-photo-15854251.jpeg?auto=compress&cs=tinysrgb&w=400",
+      "active": true,
+      "position": 2
+    },
+    {
+      "name": "Nisha Bhatt",
+      "role": "Chief Financial Officer",
+      "bio": "Former infrastructure-fund investor. Designed the asset-leasing structure that lets franchise partners enter with modest capital.",
+      "photo": "https://images.pexels.com/photos/29852895/pexels-photo-29852895.jpeg?auto=compress&cs=tinysrgb&w=400",
+      "active": true,
+      "position": 3
+    },
+    {
+      "name": "Rahul Iyer",
+      "role": "Head of Sustainability",
+      "bio": "Climate scientist turned operator. Runs the measurement methodology behind every carbon number we publish.",
+      "photo": "https://images.pexels.com/photos/34423732/pexels-photo-34423732.jpeg?auto=compress&cs=tinysrgb&w=400",
+      "active": true,
+      "position": 4
+    },
+    {
+      "name": "Fatima Qureshi",
+      "role": "Head of Rider Experience",
+      "bio": "Started as a hub manager in Mumbai. Now responsible for onboarding, training and the rider grievance process nationwide.",
+      "photo": "https://images.pexels.com/photos/18809829/pexels-photo-18809829.jpeg?auto=compress&cs=tinysrgb&w=400",
+      "active": true,
+      "position": 5
     }
   ],
   "gallery": [
